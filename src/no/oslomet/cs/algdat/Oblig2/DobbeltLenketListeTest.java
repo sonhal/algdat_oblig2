@@ -1,5 +1,7 @@
 package no.oslomet.cs.algdat.Oblig2;
 
+import java.util.Comparator;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DobbeltLenketListeTest {
@@ -97,6 +99,13 @@ class DobbeltLenketListeTest {
 
     @org.junit.jupiter.api.Test
     void nullstill() {
+        Liste<Integer> nyliste = new DobbeltLenketListe<>();
+        for (int i = 1; i <= 1_00_000; i++) nyliste.leggInn(i);
+        long tid2 = System.currentTimeMillis();
+        nyliste.nullstill();
+        tid2 = System.currentTimeMillis() - tid2;
+        System.out.println(tid2);
+        System.out.println(nyliste);
     }
 
     @org.junit.jupiter.api.Test
@@ -109,6 +118,11 @@ class DobbeltLenketListeTest {
 
     @org.junit.jupiter.api.Test
     void sorter() {
+        Liste<Integer> nyliste = new DobbeltLenketListe<>();
+        for (int i = 1; i <= 10; i++) nyliste.leggInn(i);
+
+        DobbeltLenketListe.sorter(nyliste, Comparator.naturalOrder());
+        System.out.println(nyliste);
     }
 
     @org.junit.jupiter.api.Test

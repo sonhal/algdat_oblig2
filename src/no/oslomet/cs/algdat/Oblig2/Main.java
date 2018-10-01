@@ -3,7 +3,7 @@ package no.oslomet.cs.algdat.Oblig2;
 public class Main {
 
     public static void main(String[] args){
-        Liste<String> liste = new DobbeltLenketListe<>();
+/*        Liste<String> liste = new DobbeltLenketListe<>();
         System.out.println(liste.antall() + " " + liste.tom());
         // Utskrift: 0 true
 
@@ -27,6 +27,13 @@ public class Main {
             liste3.leggInn(i);
             System.out.println(liste3.toString() + " " + liste3.omvendtString());
         }
-        // Utskrift:   // [] []   // [1] [1]   // [1, 2] [2, 1]   // [1, 2, 3] [3, 2, 1]
+        // Utskrift:   // [] []   // [1] [1]   // [1, 2] [2, 1]   // [1, 2, 3] [3, 2, 1]*/
+
+        DobbeltLenketListe<String> liste =     new DobbeltLenketListe<>(new String[]       {"Birger","Lars","Anders","Bodil","Kari","Per","Berit"});
+        liste.fjernHvis(navn -> navn.charAt(0) == 'B'); // fjerner navn som starter med B
+        System.out.println(liste + " " + liste.omvendtString());
+        // Utskrift: [Lars, Anders, Kari, Per] [Per, Kari, Anders, Lars]
+
+
     }
 }

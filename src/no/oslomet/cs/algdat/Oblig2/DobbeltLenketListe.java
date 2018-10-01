@@ -2,11 +2,7 @@ package no.oslomet.cs.algdat.Oblig2;
 
 /////////// DobbeltLenketListe ////////////////////////////////////
 
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 public class DobbeltLenketListe<T> implements Liste<T> {
     private static final class Node<T>{   // en indre
@@ -239,9 +235,28 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return node.verdi;
     }
 
+    /**
+     *  Løsning 1.
+     *  14 - 27 ms
+     *
+     *  Løsning 2.
+     *  6432 ms
+     */
     @Override
     public void nullstill(){
-        throw new UnsupportedOperationException("Ikke laget ennå!");
+        Node<T> current = hode;
+        Node<T> tmp;
+        while (current != null){
+            tmp = current.neste;
+            current.forrige = null;
+            current.verdi = null;
+            current.neste = null;
+            current = tmp;
+        }
+        antall = 0;
+        endringer++;
+        hode = null;
+        hale = null;
     }
 
     @Override
@@ -286,8 +301,56 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c){
-        throw new UnsupportedOperationException("Ikke laget ennå!");
+        kvikksortering(liste, c);
+
     }
+
+    private static <T> void kvikksortering0(Liste<T> liste, int v, int h, Comparator<? super T> c)  // en privat metode
+    {
+        if (v >= h) return;  // a[v:h] er tomt eller har maks ett element
+        int k = sParter0(liste, v, h, (v + h)/2, c);  // bruker midtverdien
+        kvikksortering0(liste, v, k - 1, c);     // sorterer intervallet a[v:k-1]
+        kvikksortering0(liste, k + 1, h, c);     // sorterer intervallet a[k+1:h]
+    }
+
+    public static <T> void kvikksortering(Liste<T> liste, int fra, int til, Comparator<? super T> c) // a[fra:til>
+    {
+        fratilKontroll(liste.antall(), fra, til);  // sjekker når metoden er offentlig
+        kvikksortering0(liste, fra, til - 1, c);  // v = fra, h = til - 1
+    }
+
+    public static <T> void kvikksortering(Liste<T> liste, Comparator<? super T> c)   // sorterer hele tabellen
+    {
+        kvikksortering0(liste, 0, liste.antall() - 1, c);
+    }
+
+    private static <T> int sParter0(Liste<T> liste, int v, int h, int indeks, Comparator<? super T> c)
+    {
+        bytt(liste, indeks, h);           // skilleverdi a[indeks] flyttes bakerst
+        int pos = parter(liste, v, h - 1, liste.hent(h), c);  // partisjonerer a[v:h − 1]
+        bytt(liste, pos, h);              // bytter for å få skilleverdien på rett plass
+        return pos;                   // returnerer posisjonen til skilleverdien
+    }
+
+    private static <T> int parter(Liste<T> liste, int v, int h, T skilleverdi, Comparator<? super T> c)
+    {
+        while (true)                                  // stopper når v > h
+        {
+            while (v <= h && c.compare(liste.hent(v), skilleverdi) < 0) v++;   // h er stoppverdi for v
+            while (v <= h && c.compare(liste.hent(h), skilleverdi) < 0) h--;  // v er stoppverdi for h
+
+            if (v < h) bytt(liste,v++,h--);                 // bytter om a[v] og a[h]
+            else  return v;  // a[v] er nåden første som ikke er mindre enn skilleverdi
+        }
+    }
+
+    private static <T> void bytt(Liste<T> liste, int v, int h){
+        T venstre = liste.hent(v);
+        T høyre = liste.hent(h);
+        liste.oppdater(v, høyre);
+        liste.oppdater(h, venstre);
+    }
+
 
     public static void fratilKontroll(int lengde, int fra, int til)
     {
@@ -337,11 +400,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public Iterator<T> iterator(){
-        throw new UnsupportedOperationException("Ikke laget ennå!");
+        return new DobbeltLenketListeIterator();
     }
 
     public Iterator<T> iterator(int indeks){
-        throw new UnsupportedOperationException("Ikke laget ennå!");
+        indeksKontroll(indeks, false);
+        return new DobbeltLenketListeIterator(indeks);
     }
 
     private class DobbeltLenketListeIterator implements Iterator<T>   {
@@ -355,7 +419,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         }
 
         private DobbeltLenketListeIterator(int indeks){
-            throw new UnsupportedOperationException("Ikke laget ennå!");
+            this();
+            while(denne != null && indeks > 0){
+                denne = denne.neste;
+                indeks--;
+            }
         }
         @Override
         public boolean hasNext(){
@@ -363,11 +431,41 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         }
         @Override
         public T next(){
-            throw new UnsupportedOperationException("Ikke laget ennå!");
+            if(!hasNext()) throw new NoSuchElementException("Iteratoren er tom");
+            if(iteratorendringer != endringer) throw new ConcurrentModificationException("Ugylding endring");
+
+            fjernOK = true;
+            T tmp = denne.verdi;
+            denne = denne.neste;
+            return tmp;
         }
         @Override
         public void remove(){
-            throw new UnsupportedOperationException("Ikke laget ennå!");
+            if(!fjernOK) throw new IllegalStateException("Kan ikke slette");
+            if(iteratorendringer != endringer) throw new ConcurrentModificationException("Kan ikke endre");
+
+            if(antall == 1){
+                hale = null;
+                hode = null;
+                antall = 0;
+            }
+            else if(denne == null){
+                hale = hale.forrige;
+                hale.neste = null;
+            }
+            else if(denne.forrige == hode){
+                hode = hode.neste;
+                hode.forrige = null;
+            }
+            else{
+                Node<T> left = denne.forrige.forrige;
+                Node<T> right = denne;
+                connectNodes(left,right);
+            }
+            fjernOK = false;
+            antall--;
+            endringer++;
+            iteratorendringer++;
         }
 
 
