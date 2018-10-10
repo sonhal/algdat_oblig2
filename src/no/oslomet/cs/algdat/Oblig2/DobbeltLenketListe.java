@@ -1,6 +1,7 @@
 package no.oslomet.cs.algdat.Oblig2;
 
 /////////// DobbeltLenketListe ////////////////////////////////////
+//s305349, Sondre Halvorsen, IT
 
 import java.util.*;
 
