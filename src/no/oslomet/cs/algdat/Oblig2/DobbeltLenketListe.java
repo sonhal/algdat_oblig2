@@ -231,11 +231,7 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         unlinkNode(node);
         antall--;
         endringer++;
-        try {
-            wait(10);
-        }catch (Exception e){
 
-        }
         return node.verdi;
     }
 
