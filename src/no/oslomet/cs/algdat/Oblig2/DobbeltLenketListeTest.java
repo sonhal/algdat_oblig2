@@ -95,6 +95,7 @@ class DobbeltLenketListeTest {
         long min = Math.min(tid1, tid2);
         System.out.println("maks: " + maks);
         System.out.println("min: " + min);
+        System.out.println("min * 1.5 = " + (1.5 * min));
     }
 
     @org.junit.jupiter.api.Test
@@ -119,10 +120,13 @@ class DobbeltLenketListeTest {
     @org.junit.jupiter.api.Test
     void sorter() {
         Liste<Integer> nyliste = new DobbeltLenketListe<>();
-        for (int i = 1; i <= 10; i++) nyliste.leggInn(i);
-
-        DobbeltLenketListe.sorter(nyliste, Comparator.naturalOrder());
+        for (int i = 80; i > 0; i--) nyliste.leggInn(i);
         System.out.println(nyliste);
+        double tic = System.currentTimeMillis();
+        DobbeltLenketListe.sorter(nyliste, Comparator.naturalOrder());
+        double toc = System.currentTimeMillis();
+        System.out.println(nyliste);
+        System.out.println(toc - tic);
     }
 
     @org.junit.jupiter.api.Test

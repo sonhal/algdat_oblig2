@@ -201,15 +201,13 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     public boolean fjern(T verdi) {
         if(verdi == null) return false;
 
-        Node<T> current = hode;
-        while (current != null){
+        for (Node<T> current = hode; current != null; current = current.neste){
             if(verdi.equals(current.verdi)){
                 antall--;
                 endringer++;
                 unlinkNode(current);
                 return true;
             }
-            current = current.neste;
         }
         return false;
     }
@@ -233,6 +231,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         unlinkNode(node);
         antall--;
         endringer++;
+        try {
+            wait(10);
+        }catch (Exception e){
+
+        }
         return node.verdi;
     }
 
@@ -302,7 +305,14 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c){
-        kvikksortering(liste, c);
+        //kvikksortering(liste, c);
+        for (int i = 0; i < liste.antall(); i++){
+            for (int j = 0; j < liste.antall(); j++){
+                if((c.compare(liste.hent(i), liste.hent(j))) < 0){
+                    bytt(liste, i, j);
+                }
+            }
+        }
 
     }
 
